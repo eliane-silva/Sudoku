@@ -87,11 +87,7 @@ static int carregarDados(const char *filename, tTabelaIdx *tab) {
 
     // Ler linhas do arquivo
     while (fgets(line, sizeof(line), file) && count < MAX_RECORDS) {
-        // A linha tipicamente é algo como:
-        // "380500091...,380500091..."
-        // Onde antes da primeira vírgula temos o puzzle original, e após a vírgula a solução.
-        
-        // Primeiro token antes da vírgula: puzzle original (81 chars), queremos apenas os 9 primeiros dígitos
+
         char *ptr = line;
         // Remover quebra de linha no final, se houver
         char *nl = strchr(ptr, '\n');
@@ -100,7 +96,6 @@ static int carregarDados(const char *filename, tTabelaIdx *tab) {
         // Verificar se a linha é grande o suficiente
         int len = (int)strlen(ptr);
         if (len < PUZZLE_SIZE + 1) { 
-            // +1 pela vírgula que deve existir
             continue;
         }
 
@@ -140,7 +135,6 @@ static int carregarDados(const char *filename, tTabelaIdx *tab) {
 
         // Armazenar no struct
         tab->ids[count] = chave;
-        // Copiar 81 chars da solução
         memcpy(&tab->solucoes[count * PUZZLE_SIZE], solucao, PUZZLE_SIZE);
 
         count++;
