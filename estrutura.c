@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "estrutura.h"
 #include "constantes.h"
 
@@ -83,6 +84,62 @@ void ordenarLista(tListaIndexada lista)
     qsort(lista.jogos, lista.nElementos, sizeof(tJogo), compararJogo);
 }
 
-char *buscaInterpolacao(tListaIndexada lista, int *jogo, int *qOperacoes)
+int buscaBinaria(tListaIndexada lista, int *jogo, int *qOperacoes)
 {
+    tJogo jogoBuscado = criarJogo();
+    memcpy(jogoBuscado.jogoInicial, jogo, 9 * sizeof(int));
+    int inf = 0, sup = lista.nElementos - 1, meio;
+
+    (*qOperacoes) = 0;
+    int linha = 0;
+
+    while (inf <= sup)
+    {
+        (*qOperacoes)++;
+
+        int *jogoInf = lista.jogos[inf].jogoInicial;
+        int *jogoSup = lista.jogos[sup].jogoInicial;
+
+        double taxa;
+
+        // if (linha < 8 && jogo[linha] == jogoInf[linha] || jogo[linha] == jogoSup[linha])
+        // {
+        //     double valorInf = jogoInf[linha] * 1e9 + jogoInf[linha + 1];
+        //     double valorSup = jogoSup[linha] * 1e9 + jogoSup[linha + 1];
+        //     double valorJogo = jogo[linha] * 1e9 + jogo[linha + 1];
+            
+        //     taxa = (double)(valorJogo - valorInf) / (valorSup - valorInf);
+        // }
+        // else
+        // {
+        //     taxa = (double)(jogo[linha] - jogoInf[linha]) / (jogoSup[linha] - jogoInf[linha]);
+        // }
+
+        meio = inf + (int)((sup - inf) / 2);
+        // meio = inf + (int)((sup - inf) * taxa);
+
+        int comparacao = compararJogo(&jogoBuscado, &lista.jogos[meio]);
+        if (comparacao == 0)
+        {
+            apagarJogo(jogoBuscado);
+            return meio;
+        }
+
+        if (comparacao == 1)
+        {
+            inf = meio + 1;
+        }
+        else
+        {
+            sup = meio - 1;
+        }
+
+        // if (jogo[linha] == lista.jogos[inf].jogoInicial[linha] && jogo[linha] == lista.jogos[sup].jogoInicial[linha])
+        // {
+        //     linha++;
+        // }
+    }
+
+    apagarJogo(jogoBuscado);
+    return -1;
 }

@@ -22,6 +22,6 @@ extern void apagarLista(tListaIndexada lista);
 extern int compararJogo(const void *a, const void *b);
 extern void ordenarLista(tListaIndexada lista);
 
-extern char *buscaInterpolacao(tListaIndexada lista, int *jogo, int *qOperacoes);
+extern int buscaBinaria(tListaIndexada lista, int *jogo, int *qOperacoes);
 
 #endif

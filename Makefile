@@ -1,2 +1,2 @@
 all:
-	gcc main.c estrutura.c leitor.c -o sudoku -O3
+	gcc main.c estrutura.c leitor.c -o program -O3

@@ -36,6 +36,7 @@ int carregarDados(char *nomeDoArquivo, tListaIndexada *lista)
             strncpy(jogo.jogoPreenchido + i * 10, 82 + linha + i * 9, 9);
             jogo.jogoPreenchido[i * 10 + 9] = '\n';
         }
+        jogo.jogoPreenchido[89] = '\0';
     
         lista->jogos[lista->nElementos++] = jogo;
     }
