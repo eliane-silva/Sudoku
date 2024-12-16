@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Debug",
-            "type": "cdbg",
+            "type": "cppdbg",  // Use cppdbg, que é a configuração suportada para depuração C/C++
             "request": "launch",
             "program": "${workspaceFolder}/sudoku",  // Caminho para o executável
             "args": [],
@@ -19,17 +19,8 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
-            "stopAtEntry": false,
-            "runInTerminal": true,
-            "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe"  // Ajuste conforme necessário
+            "preLaunchTask": "build",  // A tarefa de build que você configurou
+            "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe"  // Caminho correto do GDB
         }
     ]
 }

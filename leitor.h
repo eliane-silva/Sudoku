@@ -3,6 +3,6 @@
 
 #include "estrutura.h"
 
-extern int carregarDados(char *nomeDoArquivo, tListaIndexada lista);
+extern int carregarDados(char *nomeDoArquivo, tListaIndexada *lista);
 
 #endif

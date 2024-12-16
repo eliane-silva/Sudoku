@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "estrutura.h"
 #include "constantes.h"
@@ -6,14 +7,14 @@ tJogo criarJogo()
 {
     tJogo jogo;
 
-    jogo.jogoInicial = malloc(sizeof(long) * 9);
+    jogo.jogoInicial = malloc(sizeof(int) * 9);
     if (!jogo.jogoInicial)
     {
         puts("Erro ao alocar o jogo inicial.");
         exit(1);
     }
 
-    jogo.jogoPreenchido = malloc(sizeof(char) * 91);
+    jogo.jogoPreenchido = malloc(sizeof(char) * 90);
     if (!jogo.jogoPreenchido)
     {
         free(jogo.jogoInicial);
@@ -21,7 +22,7 @@ tJogo criarJogo()
         exit(1);
     }
 
-    jogo.jogoPreenchido[90] = "\0";
+    jogo.jogoPreenchido[89] = '\0';
 
     return jogo;
 }
@@ -82,6 +83,6 @@ void ordenarLista(tListaIndexada lista)
     qsort(lista.jogos, lista.nElementos, sizeof(tJogo), compararJogo);
 }
 
-char *buscaInterpolacao(tListaIndexada lista, long *jogo, int *qOperacoes)
+char *buscaInterpolacao(tListaIndexada lista, int *jogo, int *qOperacoes)
 {
 }
