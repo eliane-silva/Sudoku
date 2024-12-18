@@ -96,7 +96,7 @@ try:
             
             grid = formatar_sudoku(jogo_respondido)
             resultado_label.config(
-                text=f"Tempo Da Busca: {tempo_de_busca_nanossegundos} nanossegundos.\nTotal de Operações: {total_de_operacoes}.")
+                text=f"Tempo da Busca: {tempo_de_busca_nanossegundos} nanossegundos.\nTotal de Operações: {total_de_operacoes}.")
             mostrar_sudoku(grid)
         
         if process.poll() is not None:
