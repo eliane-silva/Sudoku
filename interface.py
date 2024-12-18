@@ -80,8 +80,10 @@ try:
         else:
             print("Entrada inválida, deve ter 81 caracteres.")
             messagebox.showerror("Erro", "Entrada inválida, deve ter 81 caracteres.")
+            entry.delete(0, tk.END)
             return
-
+        
+        entry.delete(0, tk.END)
         linha = process.stdout.readline().strip()
         if "jogo nao encontrado" in linha:
             resultado_label.config(text=linha)
@@ -96,7 +98,7 @@ try:
             resultado_label.config(
                 text=f"Tempo Da Busca: {tempo_de_busca_nanossegundos} nanossegundos.\nTotal de Operações: {total_de_operacoes}.")
             mostrar_sudoku(grid)
-
+        
         if process.poll() is not None:
             return 
 
