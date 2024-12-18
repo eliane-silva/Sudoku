@@ -19,7 +19,8 @@ void criarJogoBuscado(char *entrada, int *jogo)
 
 int main(int argc, char **argv)
 {
-    printf("Carregando os dados da lista...\n");
+    printf("Programa em C iniciado\n");
+    fflush(stdout);
 
     tListaIndexada lista = criarLista();
     clock_t inicio = clock();
@@ -27,22 +28,26 @@ int main(int argc, char **argv)
     clock_t fim = clock();
     double tempo_carregamento = (double)(fim - inicio) / CLOCKS_PER_SEC;
 
-    printf("Tempo de carregamento: %.3f segundos.\n\n", tempo_carregamento);
-    printf("Ordenando a lista...\n");
+    printf("registros %d\n", lista.nElementos);
+    printf("carregamento %.3f\n", tempo_carregamento);
+    fflush(stdout);
 
     inicio = clock();
     ordenarLista(lista);
     fim = clock();
     double tempo_ordenacao = (double)(fim - inicio) / CLOCKS_PER_SEC;
 
-    printf("Tempo de ordenacao: %.3f segundos.\n\n", tempo_ordenacao);
+    printf("ordenacao %.3f\n", tempo_ordenacao);
+    fflush(stdout);
+
+    printf("ok\n");
+    fflush(stdout);
 
     int qOperacoes = 0;
     int jogoBuscado[9];
     while (1)
     {
-        printf("Insira um jogo de entrada (Ou nao insira nada para sair): ");
-
+        fflush(stdout);
         char buffer[83];
         fgets(buffer, sizeof(buffer), stdin);
 
@@ -50,19 +55,17 @@ int main(int argc, char **argv)
         {
             if (buffer[0] == '\n')
             {
-                printf("\nNenhuma entrada foi fornecida. Saindo...\n\n");
+                printf("Programa em C finalizado\n");
                 break;
             }
             else
             {
-                printf("\nEntrada invalida. Por favor, insira exatamente 81 caracteres.\n\n");
+                printf("entrada invalida\n");
                 continue;
             }
         }
 
         criarJogoBuscado(buffer, jogoBuscado);
-
-        printf("\nBuscando jogo...\n");
 
         struct timeval inicioBusca, fimBusca;
         gettimeofday(&inicioBusca, NULL);
@@ -70,17 +73,19 @@ int main(int argc, char **argv)
         gettimeofday(&fimBusca, NULL);
         int tempo_busca = (int)(fimBusca.tv_sec - inicioBusca.tv_sec) * 1e6 + (fimBusca.tv_usec - inicioBusca.tv_usec);
 
-        printf("Tempo de busca: %d microssegundos.\n", tempo_busca);
-        printf("Total de operacoes realizadas: %d\n\n", qOperacoes);
         if (indice != -1)
         {
-            printf("Jogo Completo:\n%s\n\n", lista.jogos[indice].jogoPreenchido);
+            printf("%d\n", tempo_busca);
+            printf("%d\n", qOperacoes);
+            printf("%s\n", lista.jogos[indice].jogoPreenchido);
         }
         else
         {
-            printf("Jogo nao encontrado\n\n");
+            printf("jogo nao encontrado\n");
         }
+       fflush(stdout);
     }
+    fflush(stdout);
 
     apagarLista(lista);
     return 0;
