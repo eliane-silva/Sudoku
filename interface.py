@@ -66,8 +66,27 @@ try:
         limpar_sudoku()
         for i in range(9):
             for j in range(9):
-                cell = tk.Label(sudoku_frame, text=str(grid[i][j]), borderwidth=1, relief="solid", width=3, height=1)
-                cell.grid(row=i, column=j, padx=1, pady=1)
+                # Configura bordas extras entre blocos 3x3
+                border_top = 6 if i in [0, 3, 6] else 1
+                border_left = 6 if j in [0, 3, 6] else 1
+                border_bottom = 6 if i == 8 else 1
+                border_right = 6 if j == 8 else 1
+
+                cell = tk.Label(
+                    sudoku_frame,
+                    text=str(grid[i][j]),
+                    borderwidth=1,
+                    relief="solid",
+                    width=3,
+                    height=1
+                )
+                cell.grid(
+                    row=i,
+                    column=j,
+                    padx=(border_left, border_right),
+                    pady=(border_top, border_bottom)
+                )
+
 
     def mostrar_resultado():
         entrada = entry.get()
