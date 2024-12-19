@@ -55,7 +55,6 @@ int main(int argc, char **argv)
         {
             if (buffer[0] == '\n')
             {
-                printf("Programa em C finalizado\n");
                 break;
             }
             else
@@ -85,8 +84,10 @@ int main(int argc, char **argv)
         }
        fflush(stdout);
     }
-    fflush(stdout);
 
     apagarLista(lista);
+
+    printf("Programa em C finalizado\n");
+    fflush(stdout);
     return 0;
 }

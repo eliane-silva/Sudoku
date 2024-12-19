@@ -41,7 +41,6 @@ int carregarDados(char *nomeDoArquivo, tListaIndexada *lista)
         lista->jogos[lista->nElementos++] = jogo;
     }
     fclose(arquivo);
-    printf("Total de registros carregados: %d\n", lista->nElementos);
 
     return lista->nElementos;
 }

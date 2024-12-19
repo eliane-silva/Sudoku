@@ -1,22 +1,29 @@
 import subprocess
 import time
-import re
 import tkinter as tk
 from tkinter import messagebox
 
 process = None
 
 try:
+    # Janela de aviso inicial
+    loading_root = tk.Tk()
+    loading_root.title("Carregando")
+    tk.Label(
+        loading_root, text="O programa está carregando, por favor aguarde..."
+    ).pack(padx=20, pady=10)
+    loading_root.update()
+
     process = subprocess.Popen(
         ["./program"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        text=True
+        text=True,
     )
 
     ready = False
-    timeout = 30  # 30 segundos para aguardar "estou pronto"
+    timeout = 30
     start_time = time.time()
 
     total_de_registros = 0
@@ -34,7 +41,7 @@ try:
 
         if linha:
             if "registros" in linha:
-                total_de_registros = int(re.search(r'\d+', linha).group())
+                total_de_registros = int(linha.replace("registros ", ""))
                 print(f"Total de Registros Carregados: {total_de_registros}")
             elif "carregamento" in linha:
                 tempo_de_carregamento = float(linha.replace("carregamento ", ""))
@@ -54,7 +61,7 @@ try:
         process.terminate()
 
     def formatar_sudoku(jogo):
-        """ Formata os 81 dígitos em uma grade 9x9 """
+        """Formata os 81 dígitos em uma grade 9x9"""
         grid = [[int(jogo[i * 9 + j]) for j in range(9)] for i in range(9)]
         return grid
 
@@ -78,30 +85,63 @@ try:
                     borderwidth=1,
                     relief="solid",
                     width=3,
-                    height=1
+                    height=1,
                 )
                 cell.grid(
                     row=i,
                     column=j,
                     padx=(border_left, border_right),
-                    pady=(border_top, border_bottom)
+                    pady=(border_top, border_bottom),
                 )
 
+    loading_root.destroy()
+
+    root = tk.Tk()
+    root.title("Sudoku")
+    root.geometry("800x600")
+    root.minsize(800, 600)
+
+    def fechar_janela():
+        # Janela de aviso ao fechar
+        closing_root = tk.Toplevel(root)
+        closing_root.title("Fechando")
+        tk.Label(closing_root, text="O programa está encerrando, por favor aguarde...").pack(padx=20, pady=10)
+        closing_root.update()
+
+        if process is not None and process.poll() is None:
+            process.stdin.write("\n")
+            process.stdin.flush()
+
+            linha = process.stdout.readline().strip()
+            if "Programa em C finalizado" in linha:
+                print("Programa C fechando corretamente.")
+            else:
+                print("Falha ao fechar corretamente.")
+
+            process.terminate()
+
+        # Fecha a janela de aviso de encerramento e a principal
+        closing_root.destroy()
+        root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", fechar_janela)
+
+    instrucao_label = tk.Label(root, text="Digite um jogo (81 dígitos):")
+    instrucao_label.pack(pady=10)
+
+    entry = tk.Entry(root, width=81)
+    entry.pack(pady=10)
 
     def mostrar_resultado():
         entrada = entry.get()
         if len(entrada) == 81:
             process.stdin.write(entrada + "\n")
             process.stdin.flush()
-        elif len(entrada) == 0:
-            print("Saindo...")
-            return
         else:
-            print("Entrada inválida, deve ter 81 caracteres.")
             messagebox.showerror("Erro", "Entrada inválida, deve ter 81 caracteres.")
             entry.delete(0, tk.END)
             return
-        
+
         entry.delete(0, tk.END)
         linha = process.stdout.readline().strip()
         if "jogo nao encontrado" in linha:
@@ -111,29 +151,18 @@ try:
             global tempo_de_busca_nanossegundos, total_de_operacoes, jogo_respondido
             tempo_de_busca_nanossegundos = int(linha)
             total_de_operacoes = int(process.stdout.readline().strip())
-            jogo_respondido = "".join([process.stdout.readline().strip() for _ in range(9)])
-            
+            jogo_respondido = "".join(
+                [process.stdout.readline().strip() for _ in range(9)]
+            )
+
             grid = formatar_sudoku(jogo_respondido)
             resultado_label.config(
-                text=f"Tempo da Busca: {tempo_de_busca_nanossegundos} nanossegundos.\nTotal de Operações: {total_de_operacoes}.")
+                text=f"Tempo da Busca: {tempo_de_busca_nanossegundos} nanossegundos.\nTotal de Operações: {total_de_operacoes}."
+            )
             mostrar_sudoku(grid)
-        
-        if process.poll() is not None:
-            return 
-
-    root = tk.Tk()
-    root.title("Sudoku")
-    root.geometry("800x600")
-
-    instrucao_label = tk.Label(root, text="Digite um jogo (81 dígitos):")
-    instrucao_label.pack(pady=10)
-
-    entry = tk.Entry(root, width=81) 
-    entry.pack(pady=10)
 
     # Botão para calcular o resultado
-    achar_button = tk.Button(
-        root, text="Achar Resultado", command=mostrar_resultado)
+    achar_button = tk.Button(root, text="Achar Resultado", command=mostrar_resultado)
     achar_button.pack(pady=10)
 
     # Label onde o resultado será mostrado
@@ -154,8 +183,3 @@ try:
 
 except Exception as e:
     print(f"Ocorreu um erro: {e}")
-
-finally:
-    print("Finalizando o processo...")
-    if process is not None and process.poll() is None:
-        process.terminate()
