@@ -13,18 +13,19 @@ try:
     loading_root = tk.Tk()
     loading_root.title("Carregando")
     tk.Label(
-        loading_root, text="O programa está carregando, por favor aguarde...",
-        bg="lightblue"
+        loading_root,
+        text="O programa está carregando, por favor aguarde...",
+        bg="lightblue",
     ).pack(padx=20, pady=10)
     loading_root.configure(bg="lightblue")
     loading_root.update()
 
     process = subprocess.Popen(
-        ["./program.exe"],
+        ["./program"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        text=True
+        text=True,
     )
 
     ready = False
@@ -73,14 +74,16 @@ try:
             widget.destroy()
 
     def mostrar_sudoku(grid, interativo=False):
-        limpar_sudoku() 
+        limpar_sudoku()
         global cell_widgets
-        cell_widgets = [[None for _ in range(9)] for _ in range(9)]  # Cria uma matriz para armazenar os widgets de célula
+        cell_widgets = [
+            [None for _ in range(9)] for _ in range(9)
+        ]  # Cria uma matriz para armazenar os widgets de célula
 
         for i in range(9):
             for j in range(9):
                 valor = grid[i][j]
-                
+
                 border_top = 6 if i in [0, 3, 6] else 1
                 border_left = 6 if j in [0, 3, 6] else 1
                 border_bottom = 6 if i == 8 else 1
@@ -91,18 +94,20 @@ try:
                     cell = tk.Entry(
                         sudoku_frame,
                         width=3,
-                        justify='center',
+                        justify="center",
                         font=("Arial", 14),
                         relief="solid",
-                        borderwidth=1
+                        borderwidth=1,
                     )
                     cell.grid(
                         row=i,
                         column=j,
                         padx=(border_left, border_right),
-                        pady=(border_top, border_bottom)
+                        pady=(border_top, border_bottom),
                     )
-                    cell.bind("<FocusOut>", lambda e, x=i, y=j: validar_campo(e, x, y))  # Validação ao sair do campo
+                    cell.bind(
+                        "<FocusOut>", lambda e, x=i, y=j: validar_campo(e, x, y)
+                    )  # Validação ao sair do campo
                     cell_widgets[i][j] = cell
                 else:
                     # Cria uma célula fixa (Label) para valores diferentes de 0
@@ -114,24 +119,24 @@ try:
                         width=3,
                         height=1,
                         bg="lightgray",
-                        font=("Arial", 14)
+                        font=("Arial", 14),
                     )
                     cell.grid(
                         row=i,
                         column=j,
                         padx=(border_left, border_right),
-                        pady=(border_top, border_bottom)
+                        pady=(border_top, border_bottom),
                     )
                     cell_widgets[i][j] = cell
 
     def validar_campo(event, x, y):
         cell = cell_widgets[x][y]
         valor = cell.get().strip()
-        
+
         if valor == "":
             cell.config(bg="white")
             return
-        
+
         if not valor.isdigit() or not (1 <= int(valor) <= 9):
             cell.config(bg="red")
         elif int(valor) == solution[x][y]:
@@ -145,15 +150,12 @@ try:
         if len(entrada) == 81:
             process.stdin.write(entrada + "\n")
             process.stdin.flush()
-        elif len(entrada) == 0:
-            print("Saindo...")
-            return
         else:
             print("Entrada inválida, deve ter 81 caracteres.")
             messagebox.showerror("Erro", "Entrada inválida, deve ter 81 caracteres.")
             entry.delete(0, tk.END)
             return
-        
+
         entry.delete(0, tk.END)
         linha = process.stdout.readline().strip()
         if "jogo nao encontrado" in linha:
@@ -163,15 +165,15 @@ try:
             global tempo_de_busca_nanossegundos, total_de_operacoes, jogo_respondido
             tempo_de_busca_nanossegundos = int(linha)
             total_de_operacoes = int(process.stdout.readline().strip())
-            jogo_respondido = "".join([process.stdout.readline().strip() for _ in range(9)])
-            
+            jogo_respondido = "".join(
+                [process.stdout.readline().strip() for _ in range(9)]
+            )
+
             grid = formatar_sudoku(jogo_respondido)
             resultado_label.config(
-                text=f"Tempo da Busca: {tempo_de_busca_nanossegundos} nanossegundos.\nTotal de Operações: {total_de_operacoes}.")
+                text=f"Tempo da Busca: {tempo_de_busca_nanossegundos} nanossegundos.\nTotal de Operações: {total_de_operacoes}."
+            )
             mostrar_sudoku(grid)
-        
-        if process.poll() is not None:
-            return 
 
     def buscar_jogo():
         entrada = entry.get()
@@ -179,48 +181,45 @@ try:
             messagebox.showerror("Erro", "Entrada inválida. Digite 81 dígitos (0 a 9).")
             return
 
-        try:
-            process = subprocess.Popen(
-                ['./buscar_puzzle'],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
+        process.stdin.write(entrada + "\n")
+        process.stdin.flush()
+
+        linha = process.stdout.readline().strip()
+        if "jogo nao encontrado" in linha:
+            messagebox.showerror("Erro", "Jogo não encontrado no arquivo.")
+            limpar_sudoku()
+        else:
+            global tempo_de_busca_nanossegundos, total_de_operacoes, jogo_respondido
+            tempo_de_busca_nanossegundos = int(linha)
+            total_de_operacoes = int(process.stdout.readline().strip())
+            jogo_respondido = "".join(
+                [process.stdout.readline().strip() for _ in range(9)]
             )
 
-            output, error = process.communicate(input=entrada)
+            global solution
+            # Atualiza a solução e o grid
+            puzzle = entrada.strip()
+            puzzle = [[int(puzzle[i * 9 + j]) for j in range(9)] for i in range(9)]
+            solution = [
+                [int(jogo_respondido[i * 9 + j]) for j in range(9)] for i in range(9)
+            ]
 
-            if error:
-                raise RuntimeError(error.strip())
-
-            linhas = output.strip().split("\n")
-            if "jogo nao encontrado" in linhas[0]:
-                messagebox.showerror("Erro", "Jogo não encontrado no arquivo.")
-                limpar_sudoku()
-            else:
-                global solution
-                # Atualiza a solução e o grid
-                puzzle, solution_str = linhas  # Recebe o puzzle e a solução
-                solution = [[int(solution_str[i * 9 + j]) for j in range(9)] for i in range(9)]
-                mostrar_sudoku(
-                    [[int(puzzle[i * 9 + j]) for j in range(9)] for i in range(9)], 
-                    interativo=True
-                )
-                resultado_label.config(text="Puzzle carregado com sucesso.")
-                adicionar_botao_dica()
-
-        except Exception as e:
-            messagebox.showerror("Erro", f"Falha ao executar o subprocesso: {e}")
+            mostrar_sudoku(
+                puzzle,
+                interativo=True,
+            )
+            resultado_label.config(text="Puzzle carregado com sucesso.")
+            adicionar_botao_dica()
 
     def adicionar_botao_dica():
         global dica_button
-        if 'dica_button' not in globals() or not dica_button.winfo_exists():
+        if "dica_button" not in globals() or not dica_button.winfo_exists():
             dica_button = tk.Button(root, text="Dica", command=dar_dica)
             dica_button.pack(pady=10)
 
     def remover_botao_dica():
         global dica_button
-        if 'dica_button' in globals() and dica_button.winfo_exists():
+        if "dica_button" in globals() and dica_button.winfo_exists():
             dica_button.destroy()
             del dica_button
 
@@ -232,20 +231,22 @@ try:
                 if isinstance(cell, tk.Entry) and cell.get() == "":
                     # Preencher o campo vazio com a solução
                     valor_solução = solution[i][j]
-                    cell.insert(0, str(valor_solução))  
-                    cell.config(bg="yellow")  
+                    cell.insert(0, str(valor_solução))
+                    cell.config(bg="yellow")
                     return
-                elif isinstance(cell, tk.Label) and cell.cget("text") == "":  # Verifica se é uma célula de Label vazia
+                elif (
+                    isinstance(cell, tk.Label) and cell.cget("text") == ""
+                ):  # Verifica se é uma célula de Label vazia
                     # Preencher a Label com a solução
                     valor_solução = solution[i][j]
-                    cell.config(text=str(valor_solução))  
+                    cell.config(text=str(valor_solução))
                     cell.config(bg="yellow")  # Cor para indicar que foi dado uma dica
                     return
 
         messagebox.showinfo("Dica", "Não há mais campos vazios para preencher.")
 
     loading_root.destroy()
-    
+
     root = tk.Tk()
     root.title("Sudoku")
     root.geometry("800x600")
@@ -256,7 +257,12 @@ try:
         # Janela de aviso ao fechar
         closing_root = tk.Toplevel(root)
         closing_root.title("Fechando")
-        tk.Label(closing_root, text="O programa está encerrando, por favor aguarde...").pack(padx=20, pady=10)
+        tk.Label(
+            closing_root,
+            text="O programa está encerrando, por favor aguarde...",
+            bg="lightblue",
+        ).pack(padx=20, pady=10)
+        closing_root.configure(bg="lightblue")
         closing_root.update()
 
         if process is not None and process.poll() is None:
@@ -280,16 +286,32 @@ try:
     cell_widgets = [[None for _ in range(9)] for _ in range(9)]
     solution = None
 
-    instrucao_label = tk.Label(root, text="Digite um jogo (81 dígitos):", font=("Arial", 12), bg="lightblue")
+    instrucao_label = tk.Label(
+        root, text="Digite um jogo (81 dígitos):", font=("Arial", 12), bg="lightblue"
+    )
     instrucao_label.pack(pady=10)
 
     entry = tk.Entry(root, width=81, font=("Arial", 12))
     entry.pack(pady=10)
 
-    achar_button = tk.Button(root, text="Buscar Solução", command=mostrar_resultado, bg="#4CAF50", fg="white", font=("Arial", 12))
+    achar_button = tk.Button(
+        root,
+        text="Buscar Solução",
+        command=mostrar_resultado,
+        bg="#4CAF50",
+        fg="white",
+        font=("Arial", 12),
+    )
     achar_button.pack(pady=10)
 
-    buscar_button = tk.Button(root, text="Buscar Puzzle", command=buscar_jogo, bg="#4CAF50", fg="white", font=("Arial", 12))
+    buscar_button = tk.Button(
+        root,
+        text="Buscar Puzzle",
+        command=buscar_jogo,
+        bg="#4CAF50",
+        fg="white",
+        font=("Arial", 12),
+    )
     buscar_button.pack(pady=10)
 
     # Label onde o resultado será mostrado
