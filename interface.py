@@ -179,10 +179,13 @@ try:
         entrada = entry.get()
         if len(entrada) != 81 or not entrada.isdigit():
             messagebox.showerror("Erro", "Entrada inválida. Digite 81 dígitos (0 a 9).")
+            entry.delete(0, tk.END)
             return
 
         process.stdin.write(entrada + "\n")
         process.stdin.flush()
+
+        entry.delete(0, tk.END)
 
         linha = process.stdout.readline().strip()
         if "jogo nao encontrado" in linha:
