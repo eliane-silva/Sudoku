@@ -102,21 +102,7 @@ int buscaBinaria(tListaIndexada lista, int *jogo, int *qOperacoes)
 
         double taxa;
 
-        // if (linha < 8 && jogo[linha] == jogoInf[linha] || jogo[linha] == jogoSup[linha])
-        // {
-        //     double valorInf = jogoInf[linha] * 1e9 + jogoInf[linha + 1];
-        //     double valorSup = jogoSup[linha] * 1e9 + jogoSup[linha + 1];
-        //     double valorJogo = jogo[linha] * 1e9 + jogo[linha + 1];
-            
-        //     taxa = (double)(valorJogo - valorInf) / (valorSup - valorInf);
-        // }
-        // else
-        // {
-        //     taxa = (double)(jogo[linha] - jogoInf[linha]) / (jogoSup[linha] - jogoInf[linha]);
-        // }
-
         meio = inf + (int)((sup - inf) / 2);
-        // meio = inf + (int)((sup - inf) * taxa);
 
         int comparacao = compararJogo(&jogoBuscado, &lista.jogos[meio]);
         if (comparacao == 0)
@@ -134,10 +120,6 @@ int buscaBinaria(tListaIndexada lista, int *jogo, int *qOperacoes)
             sup = meio - 1;
         }
 
-        // if (jogo[linha] == lista.jogos[inf].jogoInicial[linha] && jogo[linha] == lista.jogos[sup].jogoInicial[linha])
-        // {
-        //     linha++;
-        // }
     }
 
     apagarJogo(jogoBuscado);
